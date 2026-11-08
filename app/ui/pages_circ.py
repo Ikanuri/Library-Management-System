@@ -1,7 +1,6 @@
 """Peminjaman, Pengembalian, Denda."""
 import tkinter as tk
 from datetime import date, datetime
-from tkinter import simpledialog
 
 import customtkinter as ctk
 
@@ -9,7 +8,7 @@ from app.services.base import ServiceError
 from app.services.book_service import CONDITIONS
 from app.services.return_service import HEAVY, PROPOSED_STATUS
 from . import theme
-from .components import Card, DataTable, FormDialog, ScanEntry, Toolbar, confirm, guard, info
+from .components import ask_int, Card, DataTable, FormDialog, ScanEntry, Toolbar, confirm, guard, info
 from .pages_core import Page
 
 
@@ -115,8 +114,7 @@ class ReturnsPage(Page):
             status = prop
         fee = 0
         if cond in HEAVY:
-            fee = simpledialog.askinteger("Libris", f"Kebijakan: {self.s.settings.get('lost_policy')}.\n"
-                                          "Biaya penggantian (Rp), 0 bila buku diganti/tanpa biaya:", minvalue=0, initialvalue=0) or 0
+            fee = ask_int("Biaya penggantian", f"Kebijakan: {self.s.settings.get('lost_policy')}. Biaya penggantian (Rp), 0 bila buku diganti/tanpa biaya", 0, 0) or 0
         r = self.s.returns.return_item(self.actor, code, cond, when, status, fee)
         fine = r["fine"]["amount"] if r["fine"] else 0
         self.result.configure(text=f"✔ {r['title']} dikembalikan oleh {r['member']}. Status: {r['new_status']}. "

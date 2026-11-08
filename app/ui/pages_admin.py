@@ -1,14 +1,14 @@
 """Stok Opname, Impor & Label, Laporan, Backup, Petugas & Log, Pengaturan."""
 import tkinter as tk
 from datetime import date
-from tkinter import filedialog, simpledialog
+from tkinter import filedialog
 
 import customtkinter as ctk
 
 from app.services.base import ServiceError
 from app.services.book_service import CONDITIONS
 from . import theme
-from .components import Card, DataTable, FormDialog, ScanEntry, StatCard, Toolbar, confirm, guard, info
+from .components import ask_int, Card, DataTable, FormDialog, ScanEntry, StatCard, Toolbar, confirm, guard, info
 from .pages_core import Page
 
 
@@ -97,7 +97,7 @@ class OpnamePage(Page):
         self.extra_btn.pack_forget(); self.msg.configure(text="Temuan ekstra dicatat untuk ditinjau.", text_color=theme.OK); self.refresh()
 
     def new_session(self):
-        y = simpledialog.askinteger("Libris", "Tahun stok opname:", initialvalue=date.today().year)
+        y = ask_int("Stok opname baru", "Tahun stok opname", date.today().year, 1900)
         if y: self.s.opname.create_session(self.actor, y); self.refresh()
 
     def close_first(self):

@@ -1,13 +1,11 @@
 """Jendela utama: login, sidebar, navigasi, backup otomatis saat buka/tutup."""
-from tkinter import messagebox
-
 import customtkinter as ctk
 
 import config
 from app.context import Services
 from app.services.base import ServiceError
 from . import theme
-from .components import guard
+from .components import guard, warn
 from .pages_admin import (BackupPage, ImportLabelPage, OpnamePage, ReportsPage, SettingsPage, UsersPage)
 from .pages_circ import FinesPage, LoansPage, ReturnsPage
 from .pages_core import BookDetailPage, BooksPage, DashboardPage, MembersPage
@@ -102,7 +100,7 @@ class LibrisApp(ctk.CTk):
         try:
             page.refresh(**kw)
         except ServiceError as e:
-            messagebox.showwarning("Libris", str(e))
+            warn(str(e))
 
     # ---------- backup otomatis ----------
     def _auto_backup(self, kind):
