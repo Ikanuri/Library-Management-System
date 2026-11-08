@@ -46,6 +46,11 @@ def style_option(master, values, variable, width=140, command=None):
                              command=command)
 
 
+def holder(master, **kw):
+    """Frame transparan pembungkus. CTkFrame kosong bawaannya 200 px; width/height 0 agar mengikuti isi."""
+    return ctk.CTkFrame(master, fg_color="transparent", width=0, height=0, **kw)
+
+
 def section_label(master, text):
     return ctk.CTkLabel(master, text=text, font=theme.font(theme.FS_SECTION, True), text_color=theme.TEXT)
 
@@ -289,18 +294,33 @@ class DataTable(ctk.CTkFrame):
                                  style="Libris.Treeview", selectmode="extended" if multi else "browse")
         for key, title, width in columns:
             self.tree.heading(key, text=title.upper(), anchor="w", command=lambda k=key: self.sort_by(k))
-            self.tree.column(key, width=width, anchor="w")
-        sb = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview, style="Libris.Vertical.TScrollbar")
+            self.tree.column(key, width=width, minwidth=len(title) * 7 + 22, anchor="w")
+        sb = ctk.CTkScrollbar(self, orientation="vertical", command=self.tree.yview, width=12, fg_color="transparent",
+                              button_color=theme.PANEL3, button_hover_color=theme.LINE)
         self.tree.configure(yscrollcommand=sb.set)
         self.tree.pack(side="left", fill="both", expand=True, padx=(1, 0), pady=1)
-        sb.pack(side="right", fill="y", padx=(0, 1), pady=1)
+        sb.pack(side="right", fill="y", padx=(0, 2), pady=4)
         self.tree.tag_configure("odd", background=theme.PANEL)
         self.tree.tag_configure("even", background=theme.PANEL2)
         for st, col in theme.STATUS_COLORS.items():
             self.tree.tag_configure(st, foreground=col)
         self.tree.tag_configure("late", foreground=theme.DANGER)
+        self._base = {k: max(w, len(t) * 8 + 24) for k, t, w in columns}
+        for k, w in self._base.items():
+            self.tree.column(k, width=w)
+        self.tree.bind("<Configure>", self._fit)
         if on_double:
             self.tree.bind("<Double-1>", lambda e: on_double())
+
+    def _fit(self, event=None):
+        """Perkecil kolom secara proporsional bila total lebar melebihi area (tanpa scroll horizontal)."""
+        avail = self.tree.winfo_width() - 4
+        total = sum(self._base.values())
+        if avail <= 50 or total <= avail:
+            return
+        f = avail / total
+        for k, w in self._base.items():
+            self.tree.column(k, width=int(w * f))
 
     def _cell(self, key, r):
         v = r.get(key)
@@ -324,7 +344,8 @@ class DataTable(ctk.CTkFrame):
         for n, iid in enumerate(self._order):
             r = self.rows[iid]
             tags = ["even" if n % 2 else "odd"]
-            if self.status_key and r.get(self.status_key) in theme.STATUS_COLORS:
+            if self.status_key and theme.status_kind(r.get(self.status_key)) in theme.ROW_TINT_KINDS \
+                    and r.get(self.status_key) in theme.STATUS_COLORS:
                 tags.append(r[self.status_key])
             extra = self._tagfn(r) if self._tagfn else None
             if extra:
@@ -369,10 +390,11 @@ class Toolbar(ctk.CTkFrame):
         return b
 
     def search(self, on_change, placeholder="Cari..."):
-        var = tk.StringVar()
-        style_entry(self, textvariable=var, placeholder_text=placeholder, width=280).pack(side="left", padx=(0, theme.SP2))
-        var.trace_add("write", lambda *_: on_change())
-        return var
+        """Kolom pencarian; nilai dibaca lewat `.get()`. (CTkEntry tidak menampilkan placeholder bila memakai textvariable.)"""
+        e = style_entry(self, placeholder_text=placeholder, width=280)
+        e.pack(side="left", padx=(0, theme.SP2))
+        e.bind("<KeyRelease>", lambda _e: on_change())
+        return e
 
     def combo(self, values, on_change, default=None, width=140):
         var = tk.StringVar(value=default or values[0])
@@ -447,13 +469,28 @@ class FormDialog(ctk.CTkToplevel):
 class ScanEntry(ctk.CTkEntry):
     """Kolom scan besar: Enter memanggil callback lalu mengosongkan dan memfokuskan ulang."""
 
-    def __init__(self, master, on_scan, placeholder="Pindai barcode lalu Enter", **kw):
+    def __init__(self, master, on_scan, placeholder="Pindai barcode lalu Enter", on_error=None, **kw):
         kw.setdefault("height", theme.H_SCAN)
         super().__init__(master, placeholder_text=placeholder, corner_radius=theme.R_INPUT, fg_color=theme.INPUT,
                          border_color=theme.ACCENT, border_width=2, text_color=theme.TEXT,
                          placeholder_text_color=theme.MUTED, font=theme.font(theme.FS_SCAN, True), **kw)
-        self.on_scan = guard(on_scan)
+        self.on_scan = self._wrap(on_scan, on_error)
         self.bind("<Return>", self._enter)
+
+    @staticmethod
+    def _wrap(fn, on_error):
+        """Bila on_error diberikan, ServiceError tampil inline (strip umpan balik) tanpa dialog."""
+        if on_error is None:
+            return guard(fn)
+
+        def run(code):
+            try:
+                return fn(code)
+            except ServiceError as e:
+                on_error(str(e))
+            except Exception as e:
+                on_error(f"Terjadi kesalahan: {e}")
+        return run
 
     def _enter(self, _):
         code = self.get().strip()

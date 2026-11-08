@@ -19,7 +19,7 @@ LIGHT = {
     "TEXT": "#1B2430", "SOFT": "#3D4858", "MUTED": "#6B7686",
     "ACCENT": "#1F4E8C", "BLUE": "#2F6FDB", "PURPLE": "#6D4AC9",
     "OK": "#1E8449", "WARN": "#B9770E", "DANGER": "#C0392B",
-    "SIDEBAR": "#1F4E8C", "INPUT": "#FFFFFF", "ON_ACCENT": "#FFFFFF",
+    "SIDEBAR": "#FFFFFF", "INPUT": "#FFFFFF", "ON_ACCENT": "#FFFFFF",
     "ACCENT_HOVER": "#173B6B", "DANGER_HOVER": "#922B21", "ON_DANGER": "#FFFFFF",
 }
 
@@ -60,6 +60,9 @@ FONT_FAMILY = "Segoe UI"
 MODE = "dark"
 _badges = BADGES_DARK
 STATUS_COLORS = {}
+# Treeview hanya mendukung warna per BARIS (tag), bukan per sel. Agar tabel tidak jadi hijau seluruhnya,
+# hanya status yang perlu perhatian (biru/kuning/merah/ungu) mewarnai baris; hijau dan abu tetap berteks biasa.
+ROW_TINT_KINDS = ("blue", "amber", "red", "purple")
 
 
 def apply(mode="dark"):

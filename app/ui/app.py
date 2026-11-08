@@ -29,12 +29,12 @@ class NavItem(ctk.CTkFrame):
     def __init__(self, master, icon, text, command):
         super().__init__(master, fg_color="transparent", corner_radius=theme.R_BTN, height=36)
         self.command, self.active = command, False
-        self.bar = ctk.CTkFrame(self, width=3, corner_radius=2, fg_color="transparent")
+        self.bar = ctk.CTkFrame(self, width=3, height=20, corner_radius=2, fg_color="transparent")
         self.bar.pack(side="left", fill="y", padx=(2, 0), pady=6)
         self.ico = ctk.CTkLabel(self, text=icon, width=22, font=ctk.CTkFont(family="Segoe UI Symbol", size=14), text_color=theme.MUTED)
         self.ico.pack(side="left", padx=(10, 6))
         self.lbl = ctk.CTkLabel(self, text=text, anchor="w", font=theme.font(theme.FS_BODY), text_color=theme.SOFT)
-        self.lbl.pack(side="left", fill="x", expand=True)
+        self.lbl.pack(side="left", fill="x")
         for w in (self, self.bar, self.ico, self.lbl):
             w.bind("<Button-1>", lambda e: self.command())
             w.bind("<Enter>", lambda e: self._paint(hover=True))
@@ -57,11 +57,11 @@ class NavItem(ctk.CTkFrame):
 class LibrisApp(ctk.CTk):
     def __init__(self, services: Services | None = None):
         super().__init__()
-        theme.apply("dark")       # setelah root Tk ada, agar gaya ttk ikut terkonfigurasi
+        self.services = services or Services(config.db_path(), config.backup_dir())
+        theme.apply(self.services.settings.get("theme", "dark"))   # setelah root Tk ada, agar gaya ttk ikut terkonfigurasi
         self.title(f"{config.APP_NAME} — Sistem Manajemen Perpustakaan")
         self.geometry("1280x780"); self.minsize(1100, 680)
         self.configure(fg_color=theme.BG)
-        self.services = services or Services(config.db_path(), config.backup_dir())
         self.actor = None
         self.pages, self.nav_buttons, self.current, self.current_key = {}, {}, None, None
         self.protocol("WM_DELETE_WINDOW", self.on_close)
@@ -128,7 +128,7 @@ class LibrisApp(ctk.CTk):
         main = ctk.CTkFrame(self, fg_color=theme.BG, corner_radius=0); main.pack(side="left", fill="both", expand=True)
         self._topbar(main)
         self.content = ctk.CTkFrame(main, fg_color=theme.BG, corner_radius=0); self.content.pack(fill="both", expand=True)
-        nav = ctk.CTkScrollableFrame(side, fg_color="transparent", corner_radius=0); nav.pack(fill="both", expand=True, padx=6)
+        nav = ctk.CTkScrollableFrame(side, fg_color="transparent", corner_radius=0, scrollbar_button_color=theme.PANEL3, scrollbar_button_hover_color=theme.LINE); nav.pack(fill="both", expand=True, padx=6)
         for group, items in NAV_GROUPS:
             visible = [i for i in items if self.actor.is_admin or not i[4]]
             if not visible:
@@ -173,6 +173,13 @@ class LibrisApp(ctk.CTk):
             page.refresh(**kw)
         except ServiceError as e:
             warn(str(e))
+
+    def apply_theme(self, mode):
+        """Ganti palet lalu bangun ulang UI pada halaman Pengaturan (widget membaca token saat dibuat)."""
+        theme.apply(mode)
+        self.configure(fg_color=theme.BG)
+        self.build_main()
+        self.show("settings")
 
     # ---------- backup otomatis ----------
     def _auto_backup(self, kind):
