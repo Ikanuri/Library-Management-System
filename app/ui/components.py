@@ -30,11 +30,11 @@ def confirm(msg):
 
 class Card(ctk.CTkFrame):
     def __init__(self, master, **kw):
-        super().__init__(master, fg_color=theme.CARD, corner_radius=10, **kw)
+        super().__init__(master, fg_color=theme.PANEL, corner_radius=10, **kw)
 
 
 class StatCard(Card):
-    def __init__(self, master, label, value="0", color=theme.PRIMARY):
+    def __init__(self, master, label, value="0", color=theme.ACCENT):
         super().__init__(master)
         self.value = ctk.CTkLabel(self, text=str(value), font=theme.font(24, True), text_color=color)
         self.value.pack(anchor="w", padx=14, pady=(10, 0))
@@ -54,7 +54,7 @@ class DataTable(ctk.CTkFrame):
         style.theme_use("clam")
         style.configure("Libris.Treeview", rowheight=26, font=("Segoe UI", 10), background="white",
                         fieldbackground="white", borderwidth=0)
-        style.configure("Libris.Treeview.Heading", font=("Segoe UI", 10, "bold"), background="#E8EEF7")
+        style.configure("Libris.Treeview.Heading", font=("Segoe UI", 10, "bold"), background=theme.PANEL2)
         self.tree = ttk.Treeview(self, columns=[c[0] for c in columns], show="headings", height=height,
                                  style="Libris.Treeview", selectmode="extended" if multi else "browse")
         for key, title, width in columns:
@@ -102,10 +102,10 @@ class Toolbar(ctk.CTkFrame):
         super().__init__(master, fg_color="transparent")
 
     def button(self, text, cmd, danger=False, secondary=False):
-        fg = theme.DANGER if danger else ("#E3E8F0" if secondary else theme.PRIMARY)
+        fg = theme.DANGER if danger else (theme.PANEL2 if secondary else theme.ACCENT)
         b = ctk.CTkButton(self, text=text, command=guard(cmd), width=0, fg_color=fg,
                           text_color=theme.TEXT if secondary else "white",
-                          hover_color="#CDD5E3" if secondary else (theme.PRIMARY_HOVER if not danger else "#922B21"))
+                          hover_color=theme.PANEL3 if secondary else (theme.ACCENT_HOVER if not danger else theme.DANGER_HOVER))
         b.pack(side="left", padx=(0, 6))
         return b
 
@@ -151,9 +151,9 @@ class FormDialog(ctk.CTkToplevel):
             self.vars[key], self.widgets[key] = v, w
         bar = ctk.CTkFrame(self, fg_color="transparent")
         bar.pack(fill="x", padx=12, pady=(0, 12))
-        ctk.CTkButton(bar, text="Simpan", command=self._save, fg_color=theme.PRIMARY).pack(side="right")
-        ctk.CTkButton(bar, text="Batal", command=self.destroy, fg_color="#E3E8F0", text_color=theme.TEXT,
-                      hover_color="#CDD5E3").pack(side="right", padx=6)
+        ctk.CTkButton(bar, text="Simpan", command=self._save, fg_color=theme.ACCENT).pack(side="right")
+        ctk.CTkButton(bar, text="Batal", command=self.destroy, fg_color=theme.PANEL2, text_color=theme.TEXT,
+                      hover_color=theme.PANEL3).pack(side="right", padx=6)
         self.after(120, self.grab_set)
 
     def values(self):

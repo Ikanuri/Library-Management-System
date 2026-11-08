@@ -85,7 +85,7 @@ class OpnamePage(Page):
     def do_scan(self, code):
         if not self.sid: raise ServiceError("Belum ada sesi aktif.")
         r = self.s.opname.scan(self.actor, self.sid, code, self.cond.get())
-        colors = {"ok": theme.OK, "duplikat": theme.WARN, "dipinjam": theme.PRIMARY, "ekstra_dikenal": theme.WARN, "tidak_dikenal": theme.DANGER}
+        colors = {"ok": theme.OK, "duplikat": theme.WARN, "dipinjam": theme.ACCENT, "ekstra_dikenal": theme.WARN, "tidak_dikenal": theme.DANGER}
         self.msg.configure(text=r["message"], text_color=colors[r["status"]])
         self.last_code = code
         if r["status"] in ("tidak_dikenal", "ekstra_dikenal"): self.extra_btn.pack(side="left")
@@ -324,7 +324,7 @@ class SettingsPage(Page):
         ctk.CTkLabel(r, text="Kebijakan buku hilang/rusak berat", width=300, anchor="w").pack(side="left")
         self.policy = tk.StringVar()
         ctk.CTkOptionMenu(r, values=["Ganti buku", "Bayar harga buku", "Ditentukan petugas"], variable=self.policy, width=260).pack(side="left")
-        ctk.CTkButton(card, text="Simpan", command=guard(self.save), fg_color=theme.PRIMARY).pack(anchor="w", padx=12, pady=12)
+        ctk.CTkButton(card, text="Simpan", command=guard(self.save), fg_color=theme.ACCENT).pack(anchor="w", padx=12, pady=12)
 
     def refresh(self, **kw):
         for k, v in self.vars.items(): v.set(self.s.settings.get(k, ""))

@@ -38,7 +38,7 @@ class DashboardPage(Page):
         for i, (k, lbl) in enumerate(spec):
             c = StatCard(grid, lbl); c.grid(row=i // 4, column=i % 4, padx=6, pady=6, sticky="ew")
             grid.columnconfigure(i % 4, weight=1); self.cards[k] = c
-        self.chart = tk.Canvas(self, height=200, bg=theme.CARD, highlightthickness=0)
+        self.chart = tk.Canvas(self, height=200, bg=theme.PANEL, highlightthickness=0)
         self.chart.pack(fill="x", padx=20, pady=10)
         self.opname = ctk.CTkLabel(self, text="", font=theme.font(13), text_color=theme.TEXT)
         self.opname.pack(anchor="w", padx=20)
@@ -63,7 +63,7 @@ class DashboardPage(Page):
         bw = min(70, (w - 80) // len(monthly) - 12)
         for i, (m, n) in enumerate(monthly):
             x = 50 + i * (bw + 14); h = int(120 * n / mx)
-            c.create_rectangle(x, 160 - h, x + bw, 160, fill=theme.PRIMARY, outline="")
+            c.create_rectangle(x, 160 - h, x + bw, 160, fill=theme.ACCENT, outline="")
             c.create_text(x + bw / 2, 150 - h, text=str(n), font=("Segoe UI", 9), fill=theme.TEXT)
             c.create_text(x + bw / 2, 175, text=m, font=("Segoe UI", 9), fill=theme.MUTED)
 
