@@ -61,8 +61,9 @@ def test_ask_int_validates_inline(ui):
 
 def test_toast_and_feedback_strip(ui):
     from app.ui import components as c
-    t = c.toast(ui, "Tersimpan", duration=50)
+    t = c.toast(ui, "Tersimpan", duration=3000)
     ui.update(); assert t.winfo_exists()
+    t.destroy()
     s = c.FeedbackStrip(ui); s.ok("Judul", "detail"); assert s.kind == "green"
     s.fail("Gagal"); assert s.kind == "red"
 
@@ -70,7 +71,7 @@ def test_toast_and_feedback_strip(ui):
 def test_no_literal_colors_or_messagebox_outside_theme():
     import re, pathlib
     for f in pathlib.Path("app/ui").glob("*.py"):
-        src = f.read_text()
+        src = f.read_text(encoding="utf-8")   # Windows memakai cp1252 secara bawaan
         if f.name != "theme.py":
             assert not re.search(r"#[0-9a-fA-F]{6}", src), f"warna literal di {f.name}"
         if f.name != "components.py":
