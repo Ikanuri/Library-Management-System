@@ -20,7 +20,7 @@ def _btn_colors(variant):
     if variant == "danger":
         return theme.DANGER, theme.DANGER_HOVER, theme.ON_DANGER, theme.DANGER
     if variant == "ghost":
-        return "transparent", theme.PANEL2, theme.SOFT, "transparent"
+        return "transparent", theme.PANEL2, theme.SOFT, theme.PANEL
     return theme.PANEL2, theme.PANEL3, theme.TEXT, theme.LINE      # secondary
 
 

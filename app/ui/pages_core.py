@@ -5,16 +5,33 @@ import customtkinter as ctk
 
 from app.services.book_service import ARCHIVE_REASONS, CONDITIONS
 from . import theme
-from .components import Card, DataTable, FormDialog, StatCard, Toolbar, confirm, guard, info
+from .components import Card, DataTable, FormDialog, StatCard, Toolbar, confirm, guard, info, make_button
 
 
 class Page(ctk.CTkFrame):
+    """Halaman standar: header (judul, subjudul opsional, area aksi kanan) + `self.body` berpadding 24."""
     title = ""
+    subtitle = ""
 
     def __init__(self, master, app):
-        super().__init__(master, fg_color=theme.BG)
+        super().__init__(master, fg_color=theme.BG, corner_radius=0)
         self.app, self.s = app, app.services
-        ctk.CTkLabel(self, text=self.title, font=theme.font(22, True), text_color=theme.TEXT).pack(anchor="w", padx=20, pady=(16, 8))
+        head = ctk.CTkFrame(self, fg_color="transparent"); head.pack(fill="x", padx=theme.PAD, pady=(theme.PAD, theme.SP4))
+        left = ctk.CTkFrame(head, fg_color="transparent"); left.pack(side="left")
+        ctk.CTkLabel(left, text=self.title, font=theme.font(theme.FS_TITLE, True), text_color=theme.TEXT).pack(anchor="w")
+        self.subtitle_lbl = ctk.CTkLabel(left, text=self.subtitle, font=theme.font(theme.FS_CAPTION), text_color=theme.MUTED)
+        if self.subtitle:
+            self.subtitle_lbl.pack(anchor="w")
+        self.actions = ctk.CTkFrame(head, fg_color="transparent"); self.actions.pack(side="right")
+        self.body = ctk.CTkFrame(self, fg_color="transparent"); self.body.pack(fill="both", expand=True, padx=theme.PAD, pady=(0, theme.PAD))
+
+    def add_action(self, text, cmd, variant="primary"):
+        b = make_button(self.actions, text, guard(cmd), variant); b.pack(side="left", padx=(theme.SP2, 0)); return b
+
+    def set_subtitle(self, text):
+        self.subtitle_lbl.configure(text=text)
+        if text:
+            self.subtitle_lbl.pack(anchor="w")
 
     @property
     def actor(self):
