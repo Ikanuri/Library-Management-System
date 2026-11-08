@@ -21,6 +21,7 @@ xvfb-run -a pytest -q          # Linux tanpa layar
 
 ## Paket .exe (di Windows)
 Jalankan `build_windows.bat` (PyInstaller). Hasil: `dist\Libris\Libris.exe`.
+Atau unduh dari GitHub: tab **Actions → Build Windows exe → artifact `Libris-windows`** (dibangun otomatis tiap push ke `main`, atau jalankan manual via *Run workflow*).
 
 ## Struktur
 `app/database` skema + migrasi · `app/services` aturan bisnis · `app/ui` CustomTkinter · `tests/` pytest.

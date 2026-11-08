@@ -5,6 +5,7 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/).
 ## [Belum dirilis]
 
 ### Ditambahkan
+- Workflow GitHub Actions `build-windows.yml`: tes + build `.exe` di runner Windows, hasil sebagai artifact.
 - Aplikasi Libris 0.1.0: database SQLite + migrasi, service untuk FR-01..FR-11, UI CustomTkinter, 42 tes, README, `build_windows.bat`.
 - Proposal teknis v1.2 (`docs/Proposal_Library_Management_System_Offline_v1.2.md`).
 - Prototipe UI/UX Libris v1.2 (`docs/Libris_UI_UX_Prototype_v1.2.html`).
