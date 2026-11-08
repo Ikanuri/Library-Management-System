@@ -7,11 +7,18 @@ Libris adalah aplikasi perpustakaan desktop offline untuk Windows 10/11 (satu wo
 Stack: Python 3.12, CustomTkinter, SQLite (`sqlite3`), OpenPyXL, ReportLab, python-barcode, PyInstaller, pytest.
 
 ## Status implementasi (v0.1.0)
-Sudah ada dan diuji (42 tes pytest, termasuk uji asap UI via xvfb): skema 15 tabel + migrasi, login/peran/penguncian,
+Sudah ada dan diuji (52 tes pytest, termasuk uji UI via xvfb): skema 15 tabel + migrasi, login/peran/penguncian,
 buku & eksemplar (edit/arsip/pulih/hapus/massal), anggota, peminjaman atomik, pengembalian sebagian, denda (siklus
 berjalan→ditetapkan→dibayar), laporan Excel/PDF, backup/restore (Backup API, validasi, retensi), stok opname lengkap
 (snapshot, cakupan rak dinamis, ekstra, rekonsiliasi, finalisasi, koreksi), impor Excel (dry-run, atomik), label PDF Code 128,
 dashboard, UI CustomTkinter 12 halaman.
+
+**UI (pemolesan, brief `docs/UI_Polish_Brief_Libris_CustomTkinter.md`) — selesai Fase 1–6:** token tema `app/ui/theme.py` (DARK bawaan, LIGHT),
+dialog/toast/komponen di `app/ui/components.py`, sidebar berkelompok, halaman memakai `Page` (header + `self.body`), tema gelap/terang dari Pengaturan
+(kunci setting `theme`). 52 tes lulus (`xvfb-run -a pytest -q`). Tangkapan layar: `docs/screenshots/{dark,light}/` (dibuat di Linux, bukan Windows).
+**Belum diuji manusia:** skala DPI 125/150 %, scanner USB asli, glyph ikon pada Segoe UI Symbol, kontras pada monitor sebenarnya — lihat `docs/UI_Checklist_Windows.md`.
+Pelajaran Tkinter: `CTkFrame` kosong = 200 px (pakai `holder()`); `CTkEntry` + `textvariable` menghilangkan placeholder; Treeview hanya warna per baris;
+jangan menamai method `_draw` pada subclass widget CTk; `CTkTabview.configure` harus setelah tab dibuat.
 
 **Belum / perlu dikerjakan:**
 - Uji di Windows nyata + uji scanner USB HID + cetak label fisik; build `.exe` (`build_windows.bat`) belum pernah dijalankan.
@@ -21,7 +28,7 @@ dashboard, UI CustomTkinter 12 halaman.
 - Lapisan `repositories/` tidak dibuat; SQL ada di service (penyederhanaan dari proposal §5.5).
 - Backup otomatis hanya saat buka/tutup; belum ada pengingat berkala. Cetak kartu anggota, bukti pinjam: belum.
 - Penyesuaian opname untuk eksemplar yang sedang dipinjam dilewati saat finalisasi (aman, tidak dilaporkan terpisah).
-- UI belum diuji interaktif oleh manusia; hanya render + tangkapan layar di xvfb.
+- UI belum diuji interaktif oleh manusia; hanya render, tes perilaku komponen, dan tangkapan layar di xvfb. Navigasi sidebar dengan keyboard belum ada.
 
 ## Isi repo
 | Berkas | Keterangan |
