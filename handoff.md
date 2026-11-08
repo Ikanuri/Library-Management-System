@@ -1,16 +1,34 @@
 # Handoff — Libris (Library Management System Offline)
 
-Tanggal: 2026-11-08 · Status proyek: **tahap perancangan, belum ada kode aplikasi**
+Tanggal: 2026-11-08 · Status proyek: **implementasi Fase 1–9 selesai di sisi kode (v0.1.0); Fase 10 (uji Windows, .exe, panduan) belum**
 
 ## Ringkasan
 Libris adalah aplikasi perpustakaan desktop offline untuk Windows 10/11 (satu workstation).
 Stack: Python 3.12, CustomTkinter, SQLite (`sqlite3`), OpenPyXL, ReportLab, python-barcode, PyInstaller, pytest.
 
-## Isi repo saat ini
+## Status implementasi (v0.1.0)
+Sudah ada dan diuji (42 tes pytest, termasuk uji asap UI via xvfb): skema 15 tabel + migrasi, login/peran/penguncian,
+buku & eksemplar (edit/arsip/pulih/hapus/massal), anggota, peminjaman atomik, pengembalian sebagian, denda (siklus
+berjalan→ditetapkan→dibayar), laporan Excel/PDF, backup/restore (Backup API, validasi, retensi), stok opname lengkap
+(snapshot, cakupan rak dinamis, ekstra, rekonsiliasi, finalisasi, koreksi), impor Excel (dry-run, atomik), label PDF Code 128,
+dashboard, UI CustomTkinter 12 halaman.
+
+**Belum / perlu dikerjakan:**
+- Uji di Windows nyata + uji scanner USB HID + cetak label fisik; build `.exe` (`build_windows.bat`) belum pernah dijalankan.
+- Panduan pengguna; pemetaan kolom impor di UI (service mendukung `mapping`, UI memakai urutan templat).
+- Proses panjang (impor/ekspor/backup) berjalan di thread utama dengan kursor sibuk, belum di thread terpisah
+  (koneksi SQLite terikat thread; perlu koneksi terpisah per thread).
+- Lapisan `repositories/` tidak dibuat; SQL ada di service (penyederhanaan dari proposal §5.5).
+- Backup otomatis hanya saat buka/tutup; belum ada pengingat berkala. Cetak kartu anggota, bukti pinjam: belum.
+- Penyesuaian opname untuk eksemplar yang sedang dipinjam dilewati saat finalisasi (aman, tidak dilaporkan terpisah).
+- UI belum diuji interaktif oleh manusia; hanya render + tangkapan layar di xvfb.
+
+## Isi repo
 | Berkas | Keterangan |
 |---|---|
 | `docs/Proposal_Library_Management_System_Offline_v1.2.md` | Sumber kebenaran: kebutuhan FR-01..FR-11, skema DB, arsitektur, jadwal, pengujian |
 | `docs/Libris_UI_UX_Prototype_v1.2.html` | Prototipe UI (acuan visual/alur, bukan kode produksi) |
+| `main.py`, `config.py`, `app/`, `tests/` | Aplikasi dan pengujian (lihat README) |
 | `handoff.md`, `patchnotes.md`, `changelog.md` | Dokumen serah terima dan riwayat |
 
 ## Keputusan kunci (jangan dilanggar; lihat Lampiran C proposal)
@@ -24,17 +42,15 @@ Stack: Python 3.12, CustomTkinter, SQLite (`sqlite3`), OpenPyXL, ReportLab, pyth
 - Transaksi sirkulasi atomik; `PRAGMA foreign_keys=ON` di setiap koneksi; skema via migration.
 - Grafik dashboard memakai canvas CustomTkinter (tanpa Matplotlib). Proses panjang di thread terpisah.
 
-## Struktur kode yang direncanakan
-Lihat proposal §5.5: `main.py`, `config.py`, `app/{database,models,repositories,services,ui,utils}`, `tests/`.
-Aturan bisnis hanya di `services/`, bukan di callback GUI.
+## Struktur kode
+`app/database` (connection dengan `Tx` bersarang via SAVEPOINT, schema, migrations) · `app/services` (satu service per modul, dirakit di `app/context.py`) ·
+`app/ui` (theme, components, pages_core/circ/admin, app) · `app/utils` (security, barcode, validators).
+Aturan bisnis hanya di `services/`. Tambah perubahan skema dengan menambah fungsi di `MIGRATIONS`.
 
-## Langkah berikutnya (urut fase proposal §8)
-1. **Fase 1** — fondasi: repo Python, venv, `requirements.txt`, koneksi SQLite, skema 14 tabel, migration, tes constraint.
-2. **Fase 2** — jendela utama, sidebar, login/peran, halaman Petugas & Log, tema (`ui/theme.py`), dashboard.
-3. **Fase 3** — CRUD buku/eksemplar/anggota, arsip/pulih/hapus (§3.3.2), barcode.
-4. Fase 4–10: impor & label, sirkulasi, denda, laporan, backup, stok opname, testing & packaging.
-
-Estimasi total 8–10 minggu (40–52 hari kerja).
+## Langkah berikutnya
+1. Jalankan di Windows, uji scanner & label, bangun `.exe`, uji di Windows bersih (Fase 10).
+2. Thread terpisah untuk proses panjang; pemetaan kolom impor; pengingat backup berkala.
+3. Panduan pengguna & selaraskan dokumen proposal.
 
 ## Hal terbuka (proposal §13)
 Jumlah akun petugas, format nomor anggota, durasi pinjam & tarif denda sebenarnya, batas pinjam, bulan opname, standar kerusakan, frekuensi/lokasi backup, kop/logo laporan.
@@ -42,4 +58,4 @@ Jumlah akun petugas, format nomor anggota, durasi pinjam & tarif denda sebenarny
 ## Catatan
 - Proposal §2.2a masih menyebut "Prototipe v1.1" dan §2.1 memakai nama kerja lama "LMS Desktop"; selaraskan ke v1.2/"Libris" saat revisi dokumen.
 - Nomor daftar di §12 tidak berurutan (1, 3, 4, 5, 6, 7, 9, 10).
-- Belum ada pengujian karena belum ada kode.
+- PBKDF2 memakai 600.000 iterasi; tes menurunkannya lewat `LIBRIS_PBKDF2_ITERATIONS` (jangan set di produksi).

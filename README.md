@@ -1,0 +1,26 @@
+# Libris — Library Management System (Offline)
+
+Aplikasi perpustakaan desktop offline untuk Windows 10/11: Python 3.12, CustomTkinter, SQLite.
+Spesifikasi lengkap: [`docs/Proposal_Library_Management_System_Offline_v1.2.md`](docs/Proposal_Library_Management_System_Offline_v1.2.md);
+acuan UI: [`docs/Libris_UI_UX_Prototype_v1.2.html`](docs/Libris_UI_UX_Prototype_v1.2.html).
+
+## Menjalankan
+```bash
+python -m venv .venv && .venv\Scripts\activate     # Linux/macOS: source .venv/bin/activate
+pip install -r requirements.txt
+python main.py
+```
+Saat pertama dibuka, aplikasi meminta pembuatan akun Administrator. Data tersimpan di
+`%LOCALAPPDATA%\Libris\` (Linux: `~/.local/share/Libris/`); ubah dengan variabel `LIBRIS_DATA_DIR`.
+
+## Pengujian
+```bash
+pytest -q                      # 42 tes; uji UI dilewati bila tidak ada display
+xvfb-run -a pytest -q          # Linux tanpa layar
+```
+
+## Paket .exe (di Windows)
+Jalankan `build_windows.bat` (PyInstaller). Hasil: `dist\Libris\Libris.exe`.
+
+## Struktur
+`app/database` skema + migrasi · `app/services` aturan bisnis · `app/ui` CustomTkinter · `tests/` pytest.

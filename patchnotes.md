@@ -1,5 +1,16 @@
 # Patch Notes
 
+## 2026-11-08 — Libris 0.1.0 (rilis awal, belum diuji di Windows)
+### Baru
+- Login Administrator/Petugas (password PBKDF2, penguncian setelah 5 kali gagal) dan log aktivitas.
+- Koleksi buku & eksemplar: barcode 8 digit, edit, arsip, pulihkan, hapus permanen (aturan riwayat), operasi massal.
+- Anggota, peminjaman multi-buku atomik, pengembalian sebagian, denda dengan siklus berjalan/ditetapkan/dibayar.
+- Laporan Excel & PDF (11 laporan), dashboard dengan grafik canvas.
+- Backup/restore aman, impor Excel dengan validasi uji coba, label barcode PDF.
+- Stok opname tahunan: snapshot, cakupan rak dinamis, temuan ekstra, rekonsiliasi, finalisasi terkunci.
+### Masalah diketahui
+- Belum diuji di Windows/scanner nyata; `.exe` belum dibangun; lihat `handoff.md` untuk daftar lengkap.
+
 ## 2026-11-08 — Inisialisasi repositori
 - Menambahkan dokumen perancangan Libris v1.2 (proposal + prototipe UI) ke `docs/`.
 - Menambahkan `handoff.md` (serah terima), `changelog.md` (riwayat teknis), dan berkas ini (ringkasan bagi pengguna).
