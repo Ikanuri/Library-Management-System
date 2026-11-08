@@ -1,0 +1,6 @@
+customtkinter>=5.2
+openpyxl>=3.1
+reportlab>=4.0
+python-barcode>=0.15
+pytest>=8.0
+pyinstaller>=6.0
